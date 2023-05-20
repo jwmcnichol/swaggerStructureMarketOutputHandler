@@ -1,0 +1,63 @@
+import json
+import os
+import glob
+import pandas as pd
+from datetime import date
+import shutil
+
+path = 'C:/Users/jwmcn/Downloads/structureOrders'
+archive_path = 'C:/Users/jwmcn/Downloads/structureOrdersArchive'
+
+
+# def get_path():
+#    path_value = input(print("Enter path: "))
+#    return path_value
+
+# def files_list(path):
+#    os.chdir(path)
+
+# today = date.today()
+
+
+def init_folder():
+    dir_files = os.listdir(path)
+    print(dir_files)
+    for file in dir_files:
+        file_path = f"{path}/{file}"
+        src_path = file_path
+        dst_path = archive_path
+        shutil.move(src_path, dst_path)
+        print("moved ", file, "to ", dst_path)
+    return
+
+
+def main():
+    today = date.today()
+    files_list = []
+    jsonfile = "x"
+    os.chdir(path)
+    dir_files = os.listdir(path)
+    for file in dir_files:
+        files_list.append(file)
+        print('appended')
+    for file in files_list:
+        jsonfile = f"{path}/{file}"
+        print('line 30')
+        with open(jsonfile, encoding='utf-8') as inputfile:
+            data = pd.read_json(inputfile)
+            csvext = '.csv'
+            newname = jsonfile.rsplit(".", 1)[0]
+            extname = f"{newname}{csvext}"
+            df = data
+        df.to_csv(extname, encoding='utf-8', index=False)
+    csv_files = glob.glob('*.{}'.format('csv'))
+    df_append = pd.DataFrame()
+    for file in csv_files:
+        df_temp = pd.read_csv(file)
+        df_append = df_append.append(df_temp, ignore_index=True)
+    newFile = f"combined.xlsx{today}"
+    df_append.to_csv(newFile, encoding='utf-8', index=False)
+    print('combined ')
+
+
+main()
